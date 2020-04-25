@@ -20,6 +20,16 @@ public class UIViewManager : MonoBehaviour
     [SerializeField]
     private Michsky.UI.ModernUIPack.NotificationManager errorNotification;
 
+    public string testPanelName;
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.X))
+        {
+            OpenPanel(testPanelName);
+        }
+    }
+
     private void Awake()
     {
         if (_instance != null && _instance != this)

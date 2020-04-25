@@ -9,7 +9,9 @@ public class RestaurantMenuViewControler : UIView
     private GameObject menuItemPrefab;
     [SerializeField]
     private Transform menuScrollContent;
+    [SerializeField]
 
+    Michsky.UI.ModernUIPack.ModalWindowManager mwm;
     private void Start()
     {
        RestController.OnMenuLoaded += InitializeMenuItems; 
@@ -17,7 +19,7 @@ public class RestaurantMenuViewControler : UIView
 
     public override void Initialize()
     {
-        throw new System.NotImplementedException();
+        //throw new System.NotImplementedException();
     }
 
     public override void Reinitialize()
@@ -30,7 +32,7 @@ public class RestaurantMenuViewControler : UIView
         foreach (var food in iMenu.foods)
         {
             GameObject go = Instantiate(menuItemPrefab, menuScrollContent);
-            go.GetComponent<Prefabs.MenuItemPrefab>().Initialize(food.Value);
+            go.GetComponent<Prefabs.MenuItemPrefab>().Initialize(food.Value, mwm);
         }
     }
 }

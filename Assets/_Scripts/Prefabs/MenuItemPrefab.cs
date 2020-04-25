@@ -21,8 +21,10 @@ namespace Prefabs
         private DataContainers.MenuItem item;
         [SerializeField]
         private int amount;
+        [SerializeField]
+        private Button openFoodInfo;
 
-        public void Initialize(DataContainers.MenuItem iItem)
+        public void Initialize(DataContainers.MenuItem iItem, Michsky.UI.ModernUIPack.ModalWindowManager mwm)
         {
             item = iItem;
             name.text = item.name;
@@ -36,6 +38,10 @@ namespace Prefabs
             minus.onClick.AddListener(() =>
             {
                 RemoveAmmount();
+            });
+            openFoodInfo.onClick.AddListener(() =>
+            {
+                mwm.OpenWindow();
             });
         }
 
