@@ -951,6 +951,7 @@ GameObject:
   - component: {fileID: 4871986789549534304}
   - component: {fileID: 4871986789549534306}
   - component: {fileID: 4871986789549534305}
+  - component: {fileID: 3909705156643962592}
   m_Layer: 5
   m_Name: MenuItemPrefab
   m_TagString: Untagged
@@ -1014,6 +1015,23 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &3909705156643962592
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4871986789549534319}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e0d42b155f360274899b6432a0955b19, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  name: {fileID: 8410661387194847830}
+  price: {fileID: 8604527619423978717}
+  amountText: {fileID: 5573319725688041536}
+  plus: {fileID: 2604784203716098813}
+  minus: {fileID: 2365551697703810874}
 --- !u!1 &4871986789639045963
 GameObject:
   m_ObjectHideFlags: 0

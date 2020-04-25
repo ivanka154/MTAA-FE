@@ -3,15 +3,35 @@ using System.Collections.Generic;
 using UnityEngine.Networking;
 using UnityEngine;
 
-public class rest : MonoBehaviour
+public class RestController : MonoBehaviour
 {
-    // Update is called once per frame
-    void Update()
+    public delegate void MenuLoaded(DataContainers.Menu iMenu);
+    public static MenuLoaded OnMenuLoaded;
+
+    private static RestController _instance;
+
+    public static RestController Instance
     {
-        if (Input.GetKeyDown(KeyCode.X))
+        get { return _instance; }
+    }
+
+    private void Awake()
+    {
+        if (_instance != null && _instance != this)
         {
-            StartCoroutine(GetOrder());
+            Destroy(this.gameObject);
         }
+        else
+        {
+            _instance = this;
+        }
+    }
+
+
+
+    public void func()
+    {
+        Debug.Log("000000000000000000000");
     }
 
     IEnumerator Upload()
@@ -34,7 +54,9 @@ public class rest : MonoBehaviour
         }
     }
 
-    IEnumerator GetMenu()
+    
+
+    public IEnumerator GetMenu()
     {
         using (UnityWebRequest www = UnityWebRequest.Get("http://localhost:5000/restaurant/getMenu?restaurantID=restID00"))
         {
@@ -54,6 +76,7 @@ public class rest : MonoBehaviour
                     Debug.Log(item.Value.ToString());
                 }
                 Debug.Log(m.ToString());
+                OnMenuLoaded.Invoke(m);
             }
         }
     }

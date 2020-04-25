@@ -12,7 +12,7 @@ namespace DataContainers
             foods = new Dictionary<string, MenuItem>();
             foreach (var item in iJson.list)
             {
-                foods.Add(item["id"].str, new MenuItem(item));
+                foods.Add(item["id"].ToString(), new MenuItem(item));
             }
         }
 
@@ -41,7 +41,7 @@ namespace DataContainers
             alergens = iJson["alergens"].str;
             id = iJson["id"].str;
             name = iJson["name"].str;
-            price = float.Parse(iJson["price"].ToString().Replace("\\", "").Replace(',', '.'));
+            price = float.Parse(iJson["price"].str.Replace(',', '.'));
         }
 
         override public string ToString()
