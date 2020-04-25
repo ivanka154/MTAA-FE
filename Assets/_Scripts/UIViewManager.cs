@@ -15,6 +15,10 @@ public class UIViewManager : MonoBehaviour
 
     [SerializeField]
     private Michsky.UI.ModernUIPack.WindowManager windowManager;
+    [SerializeField]
+    private Michsky.UI.ModernUIPack.NotificationManager succesNotification;
+    [SerializeField]
+    private Michsky.UI.ModernUIPack.NotificationManager errorNotification;
 
     private void Awake()
     {
@@ -44,5 +48,17 @@ public class UIViewManager : MonoBehaviour
             }
         }
         windowManager.OpenPanel(panelName);
+    }
+
+    public void SuccesNotification(string iNotification)
+    {
+        succesNotification.description = iNotification;
+        succesNotification.OpenNotification();
+    }
+
+    public void ErrorNotification(string iNotification)
+    {
+        errorNotification.description = iNotification;
+        errorNotification.OpenNotification();
     }
 }

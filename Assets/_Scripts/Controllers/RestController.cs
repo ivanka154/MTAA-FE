@@ -8,6 +8,9 @@ public class RestController : MonoBehaviour
     public delegate void MenuLoaded(DataContainers.Menu iMenu);
     public static MenuLoaded OnMenuLoaded;
 
+    public delegate void UserLogedIn(DataContainers.User iUser);
+    public static UserLogedIn OnUserLogedIn;
+
     private static RestController _instance;
     public static RestController Instance
     {
@@ -24,13 +27,6 @@ public class RestController : MonoBehaviour
         {
             _instance = this;
         }
-    }
-
-
-
-    public void func()
-    {
-        Debug.Log("000000000000000000000");
     }
 
     IEnumerator Upload()
@@ -63,6 +59,7 @@ public class RestController : MonoBehaviour
             if (www.isNetworkError || www.isHttpError)
             {
                 Debug.Log(www.error);
+                UIViewManager.Instance.ErrorNotification(www.error);
             }
             else
             {
@@ -90,20 +87,37 @@ public class RestController : MonoBehaviour
             yield return www.SendWebRequest();
             if (www.isNetworkError || www.isHttpError)
             {
-                Debug.Log(www.error);
+                JSONObject json = new JSONObject(www.downloadHandler.text);
+
+                Debug.Log(json["message"].str);
+                UIViewManager.Instance.ErrorNotification(json["message"].str);
             }
             else
             {
-                string s = www.downloadHandler.text.Replace(@"\", "");
-                JSONObject json = new JSONObject(s);
-                DataContainers.Menu m = new DataContainers.Menu(json["menu"]);
+                JSONObject json = new JSONObject(www.downloadHandler.text);
+                StartCoroutine(GetUser(json["userId"].str));
+                UIViewManager.Instance.ErrorNotification(json["message"].str);
+            }
+        }
+    }
 
-                foreach (var item in m.foods)
-                {
-                    Debug.Log(item.Value.ToString());
-                }
-                Debug.Log(m.ToString());
-                OnMenuLoaded.Invoke(m);
+    public IEnumerator GetUser(string iUserId)
+    {
+        using (UnityWebRequest www = UnityWebRequest.Get("http://localhost:5000/user?userId=" + iUserId))
+        {
+            yield return www.SendWebRequest();
+            if (www.isNetworkError || www.isHttpError)
+            {
+                Debug.Log(www.error);
+                UIViewManager.Instance.ErrorNotification(www.error);
+            }
+            else
+            {
+                JSONObject json = new JSONObject(www.downloadHandler.text);
+                DataContainers.User u = new DataContainers.User(json["user"]);
+
+                Debug.Log(u.ToString());
+                OnUserLogedIn?.Invoke(u);
             }
         }
     }
@@ -116,6 +130,7 @@ public class RestController : MonoBehaviour
             if (www.isNetworkError || www.isHttpError)
             {
                 Debug.Log(www.error);
+                UIViewManager.Instance.ErrorNotification(www.error);
             }
             else
             {

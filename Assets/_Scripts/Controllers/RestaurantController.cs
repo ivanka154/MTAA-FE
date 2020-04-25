@@ -22,19 +22,6 @@ public class RestaurantController : MonoBehaviour
         get { return _instance; }
     }
 
-    void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.X))
-        {
-            StartCoroutine(RestController.Instance.GetMenu());
-        }
-        if (Input.GetKeyDown(KeyCode.B))
-        {
-            Debug.Log( float.Parse("5.56", CultureInfo.InvariantCulture));
-            Debug.Log( CultureInfo.CurrentCulture);
-        }
-    }
-
     private void Awake()
     {
         if (_instance != null && _instance != this)
@@ -47,7 +34,4 @@ public class RestaurantController : MonoBehaviour
         }
 
     }
-
-
-
 }
