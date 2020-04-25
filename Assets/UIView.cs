@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class UIView : MonoBehaviour
+public abstract class UIView : MonoBehaviour
 {
-    public Animator animator;
+    public string panelName;
+    abstract public void Initialize();
+    abstract public void Reinitialize();
 }

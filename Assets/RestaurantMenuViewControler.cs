@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Collections;
 
-public class RestaurantMenuControler : MonoBehaviour
+public class RestaurantMenuViewControler : UIView
 {
     [SerializeField]
     private GameObject menuItemPrefab;
@@ -13,6 +13,16 @@ public class RestaurantMenuControler : MonoBehaviour
     private void Start()
     {
        RestController.OnMenuLoaded += InitializeMenuItems; 
+    }
+
+    public override void Initialize()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public override void Reinitialize()
+    {
+        throw new System.NotImplementedException();
     }
 
     public void InitializeMenuItems(DataContainers.Menu iMenu)

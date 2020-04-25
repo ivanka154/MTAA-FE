@@ -9,7 +9,6 @@ public class RestController : MonoBehaviour
     public static MenuLoaded OnMenuLoaded;
 
     private static RestController _instance;
-
     public static RestController Instance
     {
         get { return _instance; }

@@ -41,6 +41,7 @@ namespace DataContainers
             alergens = iJson["alergens"].str;
             id = iJson["id"].str;
             name = iJson["name"].str;
+            Debug.Log(iJson["price"].str.Replace(',', '.'));
             price = float.Parse(iJson["price"].str.Replace(',', '.'));
         }
 

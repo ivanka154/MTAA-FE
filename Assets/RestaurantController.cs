@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 using System.Collections;
+using System.Globalization;
 
 public class RestaurantController : MonoBehaviour
 {
@@ -11,6 +12,10 @@ public class RestaurantController : MonoBehaviour
 
     public DataContainers.Menu restaurantMenu;
 
+    private void Start()
+    {
+        CultureInfo.CurrentCulture = new CultureInfo("en-US", false);
+    }
 
     public static RestaurantController Instance
     {
@@ -23,7 +28,11 @@ public class RestaurantController : MonoBehaviour
         {
             StartCoroutine(RestController.Instance.GetMenu());
         }
-
+        if (Input.GetKeyDown(KeyCode.B))
+        {
+            Debug.Log( float.Parse("5.56", CultureInfo.InvariantCulture));
+            Debug.Log( CultureInfo.CurrentCulture);
+        }
     }
 
     private void Awake()
