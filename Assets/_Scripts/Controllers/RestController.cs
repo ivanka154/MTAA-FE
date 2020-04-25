@@ -11,6 +11,9 @@ public class RestController : MonoBehaviour
     public delegate void UserLogedIn(DataContainers.User iUser);
     public static UserLogedIn OnUserLogedIn;
 
+    public delegate void OrderLoaded(DataContainers.Order iOrder);
+    public static OrderLoaded OnOrderLoaded;
+
     private static RestController _instance;
     public static RestController Instance
     {
@@ -49,30 +52,23 @@ public class RestController : MonoBehaviour
         }
     }
 
-    
-
-    public IEnumerator GetMenu()
+    public IEnumerator GetMenu(string restaurantId)
     {
-        using (UnityWebRequest www = UnityWebRequest.Get("http://localhost:5000/restaurant/getMenu?restaurantID=restID00"))
+        using (UnityWebRequest www = UnityWebRequest.Get("http://localhost:5000/restaurant/getMenu?restaurantID=" + restaurantId))
         {
             yield return www.SendWebRequest();
             if (www.isNetworkError || www.isHttpError)
             {
                 Debug.Log(www.error);
                 UIViewManager.Instance.ErrorNotification(www.error);
+                yield break;
             }
             else
             {
                 string s = www.downloadHandler.text.Replace(@"\", "");
                 JSONObject json = new JSONObject(s);
                 DataContainers.Menu m = new DataContainers.Menu(json["menu"]);
-
-                foreach (var item in m.foods)
-                {
-                    Debug.Log(item.Value.ToString());
-                }
-                Debug.Log(m.ToString());
-                OnMenuLoaded.Invoke(m);
+                OnMenuLoaded?.Invoke(m);
             }
         }
     }
@@ -95,13 +91,13 @@ public class RestController : MonoBehaviour
             else
             {
                 JSONObject json = new JSONObject(www.downloadHandler.text);
-                StartCoroutine(GetUser(json["userId"].str));
+                StartCoroutine(GetUser(json["userId"].str, true));
                 UIViewManager.Instance.ErrorNotification(json["message"].str);
             }
         }
     }
 
-    public IEnumerator GetUser(string iUserId)
+    public IEnumerator GetUser(string iUserId, bool login = false)
     {
         using (UnityWebRequest www = UnityWebRequest.Get("http://localhost:5000/user?userId=" + iUserId))
         {
@@ -117,14 +113,15 @@ public class RestController : MonoBehaviour
                 DataContainers.User u = new DataContainers.User(json["user"]);
 
                 Debug.Log(u.ToString());
-                OnUserLogedIn?.Invoke(u);
+                if (login)
+                    OnUserLogedIn?.Invoke(u);
             }
         }
     }
 
-    IEnumerator GetOrder()
+    public IEnumerator GetOrder(string restaurantId, string tableId, string orderId)
     {
-        using (UnityWebRequest www = UnityWebRequest.Get("http://localhost:5000/order?restaurantId=restID00&tableId=2&orderId=-M49mU6rwU0W7eieqmHb"))
+        using (UnityWebRequest www = UnityWebRequest.Get("http://localhost:5000/order?restaurantId=" + restaurantId + "&tableId=" + tableId + "&orderId=" +orderId))
         {
             yield return www.SendWebRequest();
             if (www.isNetworkError || www.isHttpError)
@@ -136,21 +133,29 @@ public class RestController : MonoBehaviour
             {
                 JSONObject json = new JSONObject(www.downloadHandler.text);
                 DataContainers.Order o = new DataContainers.Order(json);
-                if (o.id.Equals("-M49mU6rwU0W7eieqmHb"))
-                {
-                    Debug.Log("jeee");
-                }
-                else
-                {
-                    if (o.id.Contains("-M49mU6rwU0W7eieqmHb"))
-                    {
-                        Debug.Log("meh");
-                    }
-                    else
-                    {
-                        Debug.Log("shit");
-                    }
-                }
+                OnOrderLoaded?.Invoke(o);
+            }
+        }
+    }
+
+    public IEnumerator CreateNewOrder(string restaurantId, string tableId, string userId)
+    {
+        WWWForm form = new WWWForm();
+        form.AddField("restaurantId", restaurantId);
+        form.AddField("tableId", tableId);
+        form.AddField("userId", userId);
+        using (UnityWebRequest www = UnityWebRequest.Post("http://localhost:5000/order/createNew", form))
+        {
+            yield return www.SendWebRequest();
+            if (www.isNetworkError || www.isHttpError)
+            {
+                Debug.Log(www.error);
+                UIViewManager.Instance.ErrorNotification(www.error);
+            }
+            else
+            {
+                JSONObject json = new JSONObject(www.downloadHandler.text);
+                DataContainers.Order o = new DataContainers.Order(json);
                 Debug.Log(o.ToString());
             }
         }

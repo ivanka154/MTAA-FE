@@ -7,10 +7,12 @@ public class UserController : MonoBehaviour
     private static UserController _instance;
 
     public DataContainers.User user;
+    public DataContainers.Menu menu;
+    public DataContainers.Order order;
 
-    public string table;
-    public string Restaurant;
-    public string order;
+    public string tableId;
+    public string restaurantId;
+    public string orderId;
 
     public static UserController Instance
     {
@@ -20,6 +22,8 @@ public class UserController : MonoBehaviour
     private void Start()
     {
         RestController.OnUserLogedIn += setLoggedUser;
+        RestController.OnMenuLoaded += setMenu;
+        RestController.OnOrderLoaded += setOrder;
     }
 
     private void Awake()
@@ -34,26 +38,20 @@ public class UserController : MonoBehaviour
         }
     }
 
-    public bool logIn(string email, string password)
+    public void logIn(string email, string password)
     {
-        Debug.Log("email: " + email + "\tpassword: " + password);
-        Debug.Log(email.Length + "\tpassword: " + password.Length);
-        if (email.Equals("test11@email.com"))
-        {
-            Debug.Log("jeee");
-        }
-        if (password.Equals("Adler2020"))
-        {
-            Debug.Log("jeee2");
-        }
-
         StartCoroutine(RestController.Instance.LogIn(email, password));
-        return true;
     }
-
     public void setLoggedUser(DataContainers.User iUser)
     {
         user = iUser;
-        UIViewManager.Instance.OpenPanel("TableView");
+    }
+    public void setMenu(DataContainers.Menu iMenu)
+    {
+        menu = iMenu;
+    }
+    public void setOrder(DataContainers.Order iOrder)
+    {
+        order = iOrder;
     }
 }
