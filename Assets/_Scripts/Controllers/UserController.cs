@@ -8,9 +8,18 @@ public class UserController : MonoBehaviour
 
     public DataContainers.User user;
 
+    public string table;
+    public string Restaurant;
+    public string order;
+
     public static UserController Instance
     {
         get { return _instance; }
+    }
+
+    private void Start()
+    {
+        RestController.OnUserLogedIn += setLoggedUser;
     }
 
     private void Awake()
@@ -24,18 +33,27 @@ public class UserController : MonoBehaviour
             _instance = this;
         }
     }
-    void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.X))
-        {
-            logIn("test1@email.com", "Alder2020");
-        }
 
-    }
     public bool logIn(string email, string password)
     {
         Debug.Log("email: " + email + "\tpassword: " + password);
+        Debug.Log(email.Length + "\tpassword: " + password.Length);
+        if (email.Equals("test11@email.com"))
+        {
+            Debug.Log("jeee");
+        }
+        if (password.Equals("Adler2020"))
+        {
+            Debug.Log("jeee2");
+        }
+
         StartCoroutine(RestController.Instance.LogIn(email, password));
         return true;
+    }
+
+    public void setLoggedUser(DataContainers.User iUser)
+    {
+        user = iUser;
+        UIViewManager.Instance.OpenPanel("TableView");
     }
 }
