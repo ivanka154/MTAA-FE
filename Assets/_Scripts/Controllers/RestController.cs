@@ -80,6 +80,34 @@ public class RestController : MonoBehaviour
         }
     }
 
+    public IEnumerator LogIn(string email, string password)
+    {
+        WWWForm form = new WWWForm();
+        form.AddField("email", email);
+        form.AddField("password", password);
+        using (UnityWebRequest www = UnityWebRequest.Post("http://localhost:5000/user/login", form))
+        {
+            yield return www.SendWebRequest();
+            if (www.isNetworkError || www.isHttpError)
+            {
+                Debug.Log(www.error);
+            }
+            else
+            {
+                string s = www.downloadHandler.text.Replace(@"\", "");
+                JSONObject json = new JSONObject(s);
+                DataContainers.Menu m = new DataContainers.Menu(json["menu"]);
+
+                foreach (var item in m.foods)
+                {
+                    Debug.Log(item.Value.ToString());
+                }
+                Debug.Log(m.ToString());
+                OnMenuLoaded.Invoke(m);
+            }
+        }
+    }
+
     IEnumerator GetOrder()
     {
         using (UnityWebRequest www = UnityWebRequest.Get("http://localhost:5000/order?restaurantId=restID00&tableId=2&orderId=-M49mU6rwU0W7eieqmHb"))
