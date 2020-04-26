@@ -15,7 +15,7 @@ namespace Prefabs
 
         private DataContainers.OrderUser user;
 
-        public void Initialize(DataContainers.OrderUser User)
+        public void Initialize(DataContainers.OrderUser User, Michsky.UI.ModernUIPack.ModalWindowManager iMwm)
         {
             user = User;
             UpdateTexts();
@@ -24,7 +24,15 @@ namespace Prefabs
                 statusButton.buttonEvent.RemoveAllListeners();
                 statusButton.buttonEvent.AddListener(() =>
                 {
-                    UIViewManager.Instance.OpenPanel("JoinRequestView");
+                    foreach (var item in UserController.Instance.order.joinRequests.Values)
+                    {
+                        if (item.requirer.Equals(User.user.id))
+                        {
+                            RestaurantController.Instance.joinRequest = item;
+                            iMwm.OpenWindow();
+                            UIViewManager.Instance.OpenPopUpPanel("JoinRequestPopUp");
+                        }
+                    }
                 });
             }
         }

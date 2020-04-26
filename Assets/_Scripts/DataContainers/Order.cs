@@ -12,12 +12,46 @@ namespace DataContainers
         public string restaurant;
         public string table;
         public Dictionary<string, Subborder> subborders;
+        public Dictionary<string, JoinRequest> joinRequests;
+        public Dictionary<string, TransferRequest> transferRequests;
+
+        public bool Loaded() 
+        {
+            if (AreJoinRequestsLoaded() && AreTransferRequestsLoaded() && AreTransferRequestsLoaded())
+            {
+                return true;
+            }
+            return false;
+        }
 
         public bool AreUsersLoaded()
         {
             foreach (var item in activeUsers)
             {
                 if (item.Value.user == null)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        public bool AreJoinRequestsLoaded()
+        {
+            foreach (var item in joinRequests)
+            {
+                if (item.Value.loaded == false)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+        public bool AreTransferRequestsLoaded()
+        {
+            foreach (var item in transferRequests)
+            {
+                if (item.Value.loaded == false)
                 {
                     return false;
                 }
@@ -77,24 +111,33 @@ namespace DataContainers
 
         public Order(JSONObject iJson)
         {
-            Debug.Log(iJson["activeUsers"].ToString());
             activeUsers = new Dictionary<string, OrderUser>();
             subborders = new Dictionary<string, Subborder>();
+            joinRequests = new Dictionary<string, JoinRequest>();
+            transferRequests = new Dictionary<string, TransferRequest>();
             foreach (var item in iJson["activeUsers"].keys)
             {
-                Debug.Log(item.ToString());
-
                 activeUsers.Add(item, new OrderUser (item, iJson["activeUsers"][item].str));
                 if (iJson["activeUsers"][item].str.Equals("active"))
                 {
                     subborders.Add(item, new Subborder(iJson["suborders"][item]));
                 }
             }
+
             id = iJson["id"].str;
             owner = iJson["owner"].str;
             restaurant = iJson["restaurant"].str;
             table = iJson["table"].str;
 
+            foreach (var item in iJson["joinRequests"].keys)
+            {
+                Debug.Log(item.ToString());
+                joinRequests.Add(item, new JoinRequest(restaurant, table, item));
+            }
+            foreach (var item in iJson["transferRequests"].keys)
+            {
+                transferRequests.Add(item, new TransferRequest(restaurant, table, item));
+            }
         }
 
         public override string ToString()
@@ -198,6 +241,66 @@ namespace DataContainers
 
     }
 
+    public class JoinRequest
+    {
+        public string aprover;
+        public string requirer;
+        public string id;
+        public bool loaded;
 
+        public JoinRequest(string restaurantId, string tableId, string requestId)
+        {
+            loaded = false;
+            RestaurantController.Instance.StartCoroutine(RestController.Instance.GetJoinRequest(requestId, restaurantId, tableId, setJoinRequest));
+        }
+
+        public void setJoinRequest(JSONObject iJson) 
+        {
+            Debug.Log(iJson.ToString());
+
+            id = iJson["id"].str;
+            requirer = iJson["requirer"].str;
+            aprover = iJson["aprover"].str;
+            loaded = true;
+        }
+    }
+
+    public class TransferRequest
+    {
+        public string aprover;
+        public string requirer;
+        public string id;
+        public transferItem item;
+        public bool loaded;
+
+        public TransferRequest(string restaurantId, string tableId, string requestId)
+        {
+            loaded = false;
+            RestaurantController.Instance.StartCoroutine(RestController.Instance.GetTransferRequest(requestId, restaurantId, tableId,  setTransferRequest));
+        }
+
+        public void setTransferRequest(JSONObject iJson)
+        {
+            Debug.Log(iJson.ToString());
+            id = iJson["id"].str;
+            requirer = iJson["requirer"].str;
+            aprover = iJson["aprover"].str;
+            item = new transferItem(iJson["item"]["id"].str, int.Parse( iJson["item"]["amount"].ToString()));
+            loaded = true;
+        }
+    }
+
+    [System.Serializable]
+    public class transferItem
+    {
+
+        [SerializeField] public string id;
+        [SerializeField] public int amount;
+        public transferItem(string iId, int iAmont)
+        {
+            id = iId;
+            amount = iAmont;
+        }
+    }
 }
 

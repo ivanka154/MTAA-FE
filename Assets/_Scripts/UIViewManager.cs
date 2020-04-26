@@ -12,7 +12,8 @@ public class UIViewManager : MonoBehaviour
 
     [SerializeField]
     private List<UIView> uiViews;
-
+    [SerializeField]
+    private List<UIView> popUpViews;
     [SerializeField]
     private Michsky.UI.ModernUIPack.WindowManager windowManager;
     [SerializeField]
@@ -58,6 +59,18 @@ public class UIViewManager : MonoBehaviour
             }
         }
         windowManager.OpenPanel(panelName);
+    }
+
+    public void OpenPopUpPanel(string panelName)
+    {
+        foreach (var item in popUpViews)
+        {
+            if (item.name.Equals(panelName))
+            {
+                item.Initialize();
+                break;
+            }
+        }
     }
 
     public void SuccesNotification(string iNotification)

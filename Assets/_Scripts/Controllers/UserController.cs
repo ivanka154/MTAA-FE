@@ -60,7 +60,5 @@ public class UserController : MonoBehaviour
     public void setOrder(DataContainers.Order iOrder)
     {
         order = iOrder;
-
-        UIViewManager.Instance.OpenPanel("TableView");
     }
 }

@@ -9,11 +9,18 @@ public class RestaurantController : MonoBehaviour
 {
     public delegate void SumUploaded(float iSum);
     public static SumUploaded OnSumUploaded;
+    public delegate void AmountUploaded(int iAmount);
+    public static AmountUploaded OnAmountUploaded;
 
     private static RestaurantController _instance;
 
     public DataContainers.Menu restaurantMenu;
-    public Dictionary<string, DataContainers.OrderItem> newOrderItems;
+    private Dictionary<string, DataContainers.OrderItem> newOrderItems;
+    private Dictionary<string, int> newTransfers;
+    public DataContainers.OrderItem TransferItem;
+    public DataContainers.TransferRequest transferRequest;
+    public DataContainers.JoinRequest joinRequest;
+
 
     private void Start()
     {
@@ -23,6 +30,7 @@ public class RestaurantController : MonoBehaviour
     public void Initialize()
     {
         newOrderItems = new Dictionary<string, DataContainers.OrderItem>();
+        newTransfers = new Dictionary<string, int>();
     }
 
     public static RestaurantController Instance
@@ -30,20 +38,12 @@ public class RestaurantController : MonoBehaviour
         get { return _instance; }
     }
 
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.X))
-        {
-            OrderSelectedItems();
-        }
-    }
-
     public void OrderSelectedItems()
     {
         Debug.Log("0");
         if (newOrderItems.Count <= 0)
             return;
-        StartCoroutine(RestController.Instance.AddNewItemToOrder(UserController.Instance.order.restaurant, UserController.Instance.order.table, UserController.Instance.user.id, UserController.Instance.order.id));
+        StartCoroutine(RestController.Instance.AddNewItemToOrder(UserController.Instance.order.restaurant, UserController.Instance.order.table, UserController.Instance.user.id, UserController.Instance.order.id, newOrderItems));
     
     }
 
@@ -90,6 +90,38 @@ public class RestaurantController : MonoBehaviour
             }
             OnSumUploaded?.Invoke(f);
         }
+    }
+
+    public void addItemToTransfer(string iUserToSendId)
+    {
+        TransferItem.amount--;
+        if (newTransfers.ContainsKey(iUserToSendId))
+        {
+            newTransfers[iUserToSendId] += 1;
+        }
+        else
+        {
+            newTransfers.Add(iUserToSendId, 1);
+        }
+        OnAmountUploaded?.Invoke(TransferItem.amount);
+
+    }
+
+    public void removeItemToTransfer(string iUserToSendId)
+    {
+        if (newTransfers.ContainsKey(iUserToSendId))
+        {
+            TransferItem.amount++;
+            if (newTransfers[iUserToSendId] == 1)
+            {
+                newTransfers.Remove(iUserToSendId);
+            }
+            else
+            {
+                newTransfers[iUserToSendId] -= 1;
+            }
+        }
+        OnAmountUploaded?.Invoke(TransferItem.amount);
     }
 
     private void Awake()

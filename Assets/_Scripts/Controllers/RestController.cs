@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine.Networking;
 using UnityEngine;
-
 public class RestController : MonoBehaviour
 {
     public delegate void MenuLoaded(DataContainers.Menu iMenu);
@@ -151,6 +150,59 @@ public class RestController : MonoBehaviour
         }
     }
 
+    public IEnumerator GetJoinRequest(string iRequestId, string iRestaurantId, string iTableId, System.Action<JSONObject> action)
+    {
+        using (UnityWebRequest www = UnityWebRequest.Get("http://localhost:5000/joinRequest?requestId=" + iRequestId + "&restaurantId=" + iRestaurantId + "&tableId=" + iTableId))
+        {
+            yield return www.SendWebRequest();
+            if (www.isNetworkError || www.isHttpError)
+            {
+                Debug.Log(www.error);
+                UIViewManager.Instance.ErrorNotification(www.error);
+            }
+            else
+            {
+                JSONObject json = new JSONObject(www.downloadHandler.text);
+                action?.Invoke(json["request"]);
+            }
+        }
+    }
+    public IEnumerator GetTransferRequest(string iRequestId, string iRestaurantId, string iTableId, System.Action<JSONObject> action)
+    {
+        using (UnityWebRequest www = UnityWebRequest.Get("http://localhost:5000/transferRequest?requestId=" + iRequestId + "&restaurantId=" + iRestaurantId + "&tableId=" + iTableId))
+        {
+            Debug.Log("http://localhost:5000/transferRequest?requestId=" + iRequestId + "&restaurantId=" + iRestaurantId + "&tableId=" + iTableId);
+            yield return www.SendWebRequest();
+            if (www.isNetworkError || www.isHttpError)
+            {
+                Debug.Log(www.error);
+                UIViewManager.Instance.ErrorNotification(www.error);
+            }
+            else
+            {
+                JSONObject json = new JSONObject(www.downloadHandler.text);
+                action?.Invoke(json["request"]);
+            }
+        }
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.X))
+        {
+            StartCoroutine(GetTransferRequest("-M5rQ1GPOikqDe-nJWYn", "restID01", "2", setTransferRequest));
+        }
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            StartCoroutine(GetJoinRequest("-M49AuPxrKwAcWfHnfZw", "restID01", "2", setTransferRequest));
+        }
+    }
+
+    public void setTransferRequest(JSONObject iJson)
+    {
+        Debug.Log("jeee");
+    }
+
     public IEnumerator GetOrder(string restaurantId, string tableId, string orderId)
     {
         using (UnityWebRequest www = UnityWebRequest.Get("http://localhost:5000/order?restaurantId=" + restaurantId + "&tableId=" + tableId + "&orderId=" +orderId))
@@ -165,13 +217,17 @@ public class RestController : MonoBehaviour
             {
                 JSONObject json = new JSONObject(www.downloadHandler.text);
                 DataContainers.Order o = new DataContainers.Order(json);
-
+                while (!o.Loaded())
+                {
+                 //   Debug.Log("yeald");
+                    yield return null;
+                }
                 OnOrderLoaded?.Invoke(o);
             }
         }
     }
 
-    public IEnumerator GetOrderCheckIfUserIsInAndJoin(string restaurantId, string tableId, string orderId, string userId)
+    public IEnumerator GetOrderCheckIfUserIsInAndJoin(string restaurantId, string tableId, string orderId, string userId, bool openTableView = false)
     {
         using (UnityWebRequest www = UnityWebRequest.Get("http://localhost:5000/order?restaurantId=" + restaurantId + "&tableId=" + tableId + "&orderId=" + orderId))
         {
@@ -189,12 +245,16 @@ public class RestController : MonoBehaviour
                 {
                     if (o.activeUsers[userId].status.Equals("active"))
                     {
-                        while (!o.AreUsersLoaded())
+                        while (!o.Loaded())
                         {
-                            Debug.Log("yeald");
+                      //      Debug.Log("yeald");
                             yield return null;
                         }
                         OnOrderLoaded?.Invoke(o);
+                        if (openTableView)
+                        {
+                            UIViewManager.Instance.OpenPanel("TableView");
+                        }
                         yield break;
                     }
                     else
@@ -222,7 +282,7 @@ public class RestController : MonoBehaviour
                 JSONObject json = new JSONObject(www.downloadHandler.text);
                 if (www.responseCode == 403)
                 {
-                    StartCoroutine(GetOrderCheckIfUserIsInAndJoin(restaurantId, tableId, json["order"].str, userId));
+                    StartCoroutine(GetOrderCheckIfUserIsInAndJoin(restaurantId, tableId, json["order"].str, userId, true));
                 }
                 Debug.Log(json["message"].str);
                 UIViewManager.Instance.ErrorNotification(json["message"].str);
@@ -236,7 +296,7 @@ public class RestController : MonoBehaviour
         }
     }
 
-    public IEnumerator AddNewItemToOrder(string restaurantId, string tableId, string userId, string orderId)
+    public IEnumerator AddNewItemToOrder(string restaurantId, string tableId, string userId, string orderId, Dictionary<string, DataContainers.OrderItem> order)
     {
         WWWForm form = new WWWForm();
         Debug.Log(form.ToString());
@@ -245,44 +305,46 @@ public class RestController : MonoBehaviour
         form.AddField("tableId", tableId);
         form.AddField("userId", userId);
         form.AddField("orderId", orderId);
-        List<foodOrder> fo = new List<foodOrder>();
-        fo.Add(new foodOrder("3", 2));
-        fo.Add(new foodOrder("0", 4));
-        form.AddField("foods", JsonUtility.ToJson(fo.ToArray().ToString()));
-        form.AddField("orderId", orderId);
-        string s = JsonUtility.ToJson(fo.ToArray().ToString());
-        string s2 = JsonUtility.ToJson(fo.ToString());
-        Debug.Log(s);
-        Debug.Log(s2);
-        yield return null;
+        foodsOnOrder fo = new foodsOnOrder(order);
+
+        Debug.Log(JsonUtility.ToJson(fo));
+        form.AddField("foods", JsonUtility.ToJson(fo).Replace("'", ""));
         using (UnityWebRequest www = UnityWebRequest.Post("http://localhost:5000/order/addNewItem", form))
         {
             yield return www.SendWebRequest();
             if (www.isNetworkError || www.isHttpError)
             {
-
                 JSONObject json = new JSONObject(www.downloadHandler.text);
                 Debug.Log(json["message"].str);
                 UIViewManager.Instance.ErrorNotification(json["message"].str);
             }
             else
             {
-                JSONObject json = new JSONObject(www.downloadHandler.text);
-                DataContainers.Order o = new DataContainers.Order(json);
-                Debug.Log(o.ToString());
+                Debug.Log(www.downloadHandler.text);
+                StartCoroutine(GetOrder(restaurantId, tableId, orderId));
             }
         }
     }
-
-    class foodOrder
+    [System.Serializable]
+    class foodsOnOrder 
     {
-        string id;
-        string amount;
-        public foodOrder(string iId, int iAmont)
+        [SerializeField]
+        public List<DataContainers.transferItem> foods;
+
+        public foodsOnOrder(Dictionary<string, DataContainers.OrderItem> order) 
         {
-            id = iId;
-            amount = iAmont.ToString();
+            foods = new List<DataContainers.transferItem>();
+            foreach (var item in order.Values)
+            {
+                foods.Add(new DataContainers.transferItem(item.id, item.amount));
+            }
+            Debug.Log("---");
+
+            Debug.Log(JsonUtility.ToJson(foods));
+
         }
     }
+
+
 
 }

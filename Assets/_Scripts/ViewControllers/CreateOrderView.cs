@@ -13,6 +13,15 @@ public class CreateOrderView : UIView
     [SerializeField]
     private Button createNewOrder;
 
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.M))
+        {
+            StartCoroutine(RestController.Instance.CreateNewOrder(restaurantId.text, tableId.text, UserController.Instance.user.id));
+        }
+
+    }
+
     public override void Initialize()
     {
         createNewOrder.onClick.RemoveAllListeners();

@@ -14,15 +14,26 @@ namespace Prefabs
         private TextMeshProUGUI amount;
         [SerializeField]
         private TextMeshProUGUI price;
+
         [SerializeField]
-        private TextMeshProUGUI members;
+        private Button transferItemButton;
 
         private DataContainers.OrderItem item;
 
-        public void Initialize(DataContainers.OrderItem iItem)
+        public void Initialize(DataContainers.OrderItem iItem, bool iActivateButton = false)
         {
             item = iItem;
             UpdateTexts();
+            transferItemButton.onClick.RemoveAllListeners();
+            if (iActivateButton)
+            {
+                transferItemButton.onClick.AddListener(() => {
+                    RestaurantController.Instance.TransferItem = item;
+                    UIViewManager.Instance.OpenPanel("TransferItemView");
+                    RestaurantController.Instance.TransferItem = item;
+
+                });
+            }
         }
 
         private void UpdateTexts()
