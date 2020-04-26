@@ -18,6 +18,7 @@ namespace Prefabs
         private Button plus;
         [SerializeField]
         private Button minus;
+
         private DataContainers.MenuItem item;
         [SerializeField]
         private int amount;
@@ -47,9 +48,10 @@ namespace Prefabs
 
         private void AddAmount()
         {
+            RestaurantController.Instance.addItemToOrder(item);
+
             amount = amount +1;
             amountText.text = amount.ToString();
-            Debug.Log("kurva");
         }
 
         private void RemoveAmmount()
@@ -59,6 +61,7 @@ namespace Prefabs
             {
                 return;
             }
+            RestaurantController.Instance.removeItemFromOrder(item);
             amount--;
             amountText.text = amount.ToString();
         }

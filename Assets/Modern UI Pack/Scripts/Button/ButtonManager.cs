@@ -28,6 +28,7 @@ namespace Michsky.UI.ModernUIPack
 
         void Start()
         {
+            UpdateUI();
             if (useCustomContent == false && normalText == null && highlightedText == null)
                 UpdateUI();
 

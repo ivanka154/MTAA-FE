@@ -76,6 +76,7 @@ namespace Michsky.UI.ModernUIPack
 
         public void OpenNotification()
         {
+            UpdateUI();
             notificationAnimator.Play("In");
 
             if (enableTimer == true)

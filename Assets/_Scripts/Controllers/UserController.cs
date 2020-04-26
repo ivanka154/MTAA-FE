@@ -42,9 +42,16 @@ public class UserController : MonoBehaviour
     {
         StartCoroutine(RestController.Instance.LogIn(email, password));
     }
+
+    public void register(string name, string email, string password)
+    {
+        StartCoroutine(RestController.Instance.Register(name, email, password));
+    }
+
     public void setLoggedUser(DataContainers.User iUser)
     {
         user = iUser;
+        UIViewManager.Instance.OpenPanel("CreateOrderView");
     }
     public void setMenu(DataContainers.Menu iMenu)
     {
@@ -53,5 +60,7 @@ public class UserController : MonoBehaviour
     public void setOrder(DataContainers.Order iOrder)
     {
         order = iOrder;
+
+        UIViewManager.Instance.OpenPanel("TableView");
     }
 }

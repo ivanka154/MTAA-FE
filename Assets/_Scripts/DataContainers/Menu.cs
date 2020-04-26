@@ -39,7 +39,7 @@ namespace DataContainers
         {
             description = iJson["description"].str;
             alergens = iJson["alergens"].str;
-            id = iJson["id"].str;
+            id = iJson["id"].ToString();
             name = iJson["name"].str;
             Debug.Log(iJson["price"].str.Replace(',', '.'));
             price = float.Parse(iJson["price"].str.Replace(',', '.'));

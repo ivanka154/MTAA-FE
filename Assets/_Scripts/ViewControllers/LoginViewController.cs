@@ -9,6 +9,10 @@ public class LoginViewController : UIView
     [SerializeField]
     private Button loginButton;
     [SerializeField]
+    private Button signuUpButton;
+    [SerializeField]
+    private Button forgetPasswordButton;
+    [SerializeField]
     private TMP_InputField email;
     [SerializeField]
     private TMP_InputField password;
@@ -19,6 +23,14 @@ public class LoginViewController : UIView
         loginButton.onClick.AddListener(() => {
             UserController.Instance.logIn(email.text, password.text);
           //  UIViewManager.Instance.OpenPanel("TableView");
+        });
+        signuUpButton.onClick.RemoveAllListeners();
+        signuUpButton.onClick.AddListener(() => {
+            UIViewManager.Instance.OpenPanel("RegisterView");
+        });
+        forgetPasswordButton.onClick.RemoveAllListeners();
+        forgetPasswordButton.onClick.AddListener(() => {
+            UIViewManager.Instance.ErrorNotification("Button not yet impelented");
         });
     }
 
