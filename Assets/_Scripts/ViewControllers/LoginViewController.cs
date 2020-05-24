@@ -21,8 +21,9 @@ public class LoginViewController : UIView
     {
         loginButton.onClick.RemoveAllListeners();
         loginButton.onClick.AddListener(() => {
+       //     UIViewManager.Instance.OpenPanel("TableView");
             UserController.Instance.logIn(email.text, password.text);
-          //  UIViewManager.Instance.OpenPanel("TableView");
+       //     UIViewManager.Instance.OpenPanel("TableView");
         });
         signuUpButton.onClick.RemoveAllListeners();
         signuUpButton.onClick.AddListener(() => {

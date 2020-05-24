@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Michsky.UI.ModernUIPack;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -21,6 +22,8 @@ public class TableViewController : UIView
     private Transform requestsScrollContent;
     [SerializeField]
     private Button orderButton;
+    [SerializeField]
+    private Button paymentButton;
 
     [SerializeField]
     private Michsky.UI.ModernUIPack.ModalWindowManager joinRequestPopUp;
@@ -36,6 +39,34 @@ public class TableViewController : UIView
         InitializeMyItems(UserController.Instance.order);
         InitializeMembers(UserController.Instance.order);
         InitializeRequests(UserController.Instance.order);
+        paymentButton.onClick.RemoveAllListeners();
+        paymentButton.onClick.AddListener(async () => {
+            List<string> transferRequestIds = new List<string>();
+            foreach (var item in UserController.Instance.order.transferRequests.Keys)
+            {
+                transferRequestIds.Add(item);
+            }
+            foreach (var item in UserController.Instance.order.transferRequests.Values)
+            {
+                if (item.requirer.Equals(UserController.Instance.user.id) || item.aprover.Equals(UserController.Instance.user.id))
+                {
+                    UIViewManager.Instance.ErrorNotification("User has pending items");
+                    return;
+                }
+            }
+            DataContainers.Order newOrder = UserController.Instance.order;
+            var suborder = newOrder.suborders[UserController.Instance.user.id];
+            suborder.items = new Dictionary<string, DataContainers.OrderItem>();
+            await DB.Order.UpdateOrder(UserController.Instance.order.restaurant, UserController.Instance.order.table, UserController.Instance.order.id, newOrder);
+            //StartCoroutine(RestController.Instance.Payment(
+            //    UserController.Instance.order.restaurant,
+            //    UserController.Instance.order.table,
+            //    UserController.Instance.user.id,
+            //    "1",
+            //    UserController.Instance.order.id,
+            //    transferRequestIds
+            //    ));
+        });
         //throw new System.NotImplementedException();
     }
 
@@ -75,6 +106,7 @@ public class TableViewController : UIView
         }
         foreach (var item in iOrder.transferRequests.Values)
         {
+            Debug.Log("request aprover: " + item.aprover);
             if (item.aprover.Equals(UserController.Instance.user.id))
             {
                 GameObject go = Instantiate(transferItemRequestPrefab, requestsScrollContent);
@@ -91,6 +123,7 @@ public class TableViewController : UIView
         }
         foreach (var item in iOrder.activeUsers)
         {
+            Debug.Log("member id: " + item.Value.user.id);
             GameObject go = Instantiate(memberItemPrefab, membersScrollContent);
             go.GetComponent<Prefabs.OrderUser>().Initialize(item.Value, joinRequestPopUp);
         }

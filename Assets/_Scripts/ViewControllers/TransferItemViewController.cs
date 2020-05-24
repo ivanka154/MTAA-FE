@@ -32,7 +32,8 @@ public class TransferItemViewController : UIView
         });
         transferButton.onClick.RemoveAllListeners();
         transferButton.onClick.AddListener(() => {
-
+            RestaurantController.Instance.TransferItems();
+            UIViewManager.Instance.OpenPanel("TableView");
         });
         itemName.text = RestaurantController.Instance.TransferItem.name;
         itemAmount.text = RestaurantController.Instance.TransferItem.amount.ToString();
@@ -42,7 +43,7 @@ public class TransferItemViewController : UIView
         }
         foreach (var item in UserController.Instance.order.activeUsers.Values)
         {
-            if (!item.status.Equals("active"))
+            if (!item.status.Equals("active") || item.user.id.Equals(UserController.Instance.user.id))
             {
                 continue;
             }

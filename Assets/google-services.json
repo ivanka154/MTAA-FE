@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "850022581751",
+    "firebase_url": "https://mtaa-cc329.firebaseio.com",
+    "project_id": "mtaa-cc329",
+    "storage_bucket": "mtaa-cc329.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:850022581751:android:a24d946eab55806afbdaf2",
+        "android_client_info": {
+          "package_name": "com.DefaultCompany.Mtaa"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "850022581751-4eq4rlmsdq3voh0vm8b5hu0jn6eevj5m.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD1mlZn70BXtaj7iGcmD3XSmMimqkIbWUg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "850022581751-4eq4rlmsdq3voh0vm8b5hu0jn6eevj5m.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

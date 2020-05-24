@@ -4,6 +4,8 @@ using UnityEngine;
 
 namespace DataContainers
 {
+    [SerializeField]
+    [System.Serializable]
     public class Menu
     {
         public Dictionary<string, MenuItem> foods;
@@ -14,6 +16,11 @@ namespace DataContainers
             {
                 foods.Add(item["id"].ToString(), new MenuItem(item));
             }
+        }
+
+        public Menu()
+        {
+            foods = new Dictionary<string, MenuItem>();
         }
 
         override public string ToString()
@@ -43,6 +50,17 @@ namespace DataContainers
             name = iJson["name"].str;
             Debug.Log(iJson["price"].str.Replace(',', '.'));
             price = float.Parse(iJson["price"].str.Replace(',', '.'));
+        }
+
+        public MenuItem(Firebase.Database.DataSnapshot sn)
+        {
+            MenuItem mi = JsonUtility.FromJson<DataContainers.MenuItem>(sn.GetRawJsonValue());
+
+            id = sn.Child("id").Value.ToString();
+            name = mi.name;
+            description = mi.description;
+            alergens = mi.alergens;
+            price = mi.price;
         }
 
         override public string ToString()

@@ -15,6 +15,7 @@ public class RestaurantController : MonoBehaviour
     private static RestaurantController _instance;
 
     public DataContainers.Menu restaurantMenu;
+    public DataContainers.MenuItem openedMenuItem;
     private Dictionary<string, DataContainers.OrderItem> newOrderItems;
     private Dictionary<string, int> newTransfers;
     public DataContainers.OrderItem TransferItem;
@@ -38,13 +39,54 @@ public class RestaurantController : MonoBehaviour
         get { return _instance; }
     }
 
-    public void OrderSelectedItems()
+    public async void OrderSelectedItems()
     {
         Debug.Log("0");
         if (newOrderItems.Count <= 0)
             return;
-        StartCoroutine(RestController.Instance.AddNewItemToOrder(UserController.Instance.order.restaurant, UserController.Instance.order.table, UserController.Instance.user.id, UserController.Instance.order.id, newOrderItems));
-    
+        //StartCoroutine(RestController.Instance.AddNewItemToOrder(
+        //    UserController.Instance.order.restaurant, 
+        //    UserController.Instance.order.table, 
+        //    UserController.Instance.user.id, 
+        //    UserController.Instance.order.id, 
+        //    newOrderItems));
+
+        DataContainers.Order newOrder = UserController.Instance.order;
+        var suborder = newOrder.suborders[UserController.Instance.user.id];
+        foreach (var item in newOrderItems)
+        {
+            if (suborder.items.ContainsKey(item.Key))
+            {
+                suborder.items[item.Key].delivered += item.Value.amount;
+            }
+            else
+            {
+                suborder.items.Add(item.Key, new DataContainers.OrderItem(item.Value.amount, item.Key));
+            }
+        }
+        await DB.Order.UpdateOrder(UserController.Instance.order.restaurant, UserController.Instance.order.table, UserController.Instance.order.id, newOrder);
+    }
+
+    public async void TransferItems()
+    {
+        DataContainers.Order newOrder = UserController.Instance.order;
+        var suborder = newOrder.suborders[UserController.Instance.user.id];
+
+        foreach (var item in newTransfers)
+        {
+            //  Debug.Log(item);
+            await DB.Order.CreateNewTransferRequest(
+                UserController.Instance.order.restaurant, 
+                UserController.Instance.order.table, 
+                UserController.Instance.user.id, 
+                item.Key, 
+                UserController.Instance.order.id, 
+                new DataContainers.transferItem(TransferItem.id, item.Value),
+                suborder.items[TransferItem.id].delivered - item.Value, suborder.items[TransferItem.id].transfered + item.Value
+                );
+
+            //StartCoroutine(RestController.Instance.CreateNewTransferRequest(UserController.Instance.order.restaurant, UserController.Instance.order.table, UserController.Instance.user.id, item.Key, UserController.Instance.order.id, new DataContainers.transferItem(TransferItem.id, item.Value)));
+        }
     }
 
     public void addItemToOrder(DataContainers.MenuItem iItem)

@@ -42,6 +42,8 @@ namespace Prefabs
             });
             openFoodInfo.onClick.AddListener(() =>
             {
+                RestaurantController.Instance.openedMenuItem = item;
+                UIViewManager.Instance.OpenPopUpPanel("FoodItemInfoPopUp");
                 mwm.OpenWindow();
             });
         }

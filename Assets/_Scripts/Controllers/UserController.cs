@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class UserController : MonoBehaviour
 {
@@ -24,6 +25,7 @@ public class UserController : MonoBehaviour
         RestController.OnUserLogedIn += setLoggedUser;
         RestController.OnMenuLoaded += setMenu;
         RestController.OnOrderLoaded += setOrder;
+        DB.Order.OnOrderLoaded += setOrder;
     }
 
     private void Awake()
@@ -51,6 +53,7 @@ public class UserController : MonoBehaviour
     public void setLoggedUser(DataContainers.User iUser)
     {
         user = iUser;
+        UIViewManager.Instance.Username.text = iUser.name;
         UIViewManager.Instance.OpenPanel("CreateOrderView");
     }
     public void setMenu(DataContainers.Menu iMenu)
@@ -60,5 +63,6 @@ public class UserController : MonoBehaviour
     public void setOrder(DataContainers.Order iOrder)
     {
         order = iOrder;
+        UIViewManager.Instance.InitializePanel("TableView");
     }
 }

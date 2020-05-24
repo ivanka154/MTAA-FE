@@ -21,6 +21,12 @@ public class UIViewManager : MonoBehaviour
     [SerializeField]
     private Michsky.UI.ModernUIPack.NotificationManager errorNotification;
 
+    [SerializeField]
+    private UnityEngine.UI.Button refresh;
+
+    [SerializeField]
+    public TMPro.TextMeshProUGUI Username;
+
     public string testPanelName;
 
     private void Update()
@@ -46,6 +52,11 @@ public class UIViewManager : MonoBehaviour
     private void Start()
     {
         OpenPanel(uiViews[0].name);
+        refresh.onClick.RemoveAllListeners();
+        refresh.onClick.AddListener(() => {
+            OpenPanel("GalleryView");
+           // StartCoroutine(RestController.Instance.GetOrder(UserController.Instance.order.restaurant, UserController.Instance.order.table, UserController.Instance.order.id));
+        });
     }
 
     public void OpenPanel(string panelName) 
@@ -69,6 +80,17 @@ public class UIViewManager : MonoBehaviour
             {
                 item.Initialize();
                 break;
+            }
+        }
+    }
+
+    public void InitializePanel(string panelName)
+    {
+        foreach (var item in uiViews)
+        {
+            if (item.name.Equals(panelName))
+            {
+                item.Initialize();
             }
         }
     }
